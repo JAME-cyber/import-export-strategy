@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Operator Roster — Import System</title>
+<meta name="description" content="Agents IA d'analyse import : coût complet réel, conformité, saturation, scénarios. Bêta fermée. Pas une promesse d'exécution automatique." />
+<style>
+  :root{
+    --bg:#0a0b0d;
+    --bg-2:#101216;
+    --ink:#e8e9ec;
+    --ink-dim:#9aa0aa;
+    --line:#1d2026;
+    --amber:#e8a13a;
+    --amber-dim:#8a6122;
+    --ok:#4ade80;
+    --danger:#ef4444;
+    --mono:'JetBrains Mono','SFMono-Regular',ui-monospace,Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:var(--sans);line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* Top bar */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,11,13,.82);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:54px}
+  .brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+  .topbar nav{display:flex;gap:22px;color:var(--ink-dim)}
+  .topbar nav a:hover{color:var(--amber)}
+  .roster-count{color:var(--amber)}
+
+  /* Hero */
+  .hero{padding:88px 0 56px;position:relative}
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(700px 300px at 80% -10%,rgba(232,161,58,.10),transparent 70%);
+    pointer-events:none;
+  }
+  .kicker{
+    font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--amber);margin-bottom:22px;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .kicker::before{content:"";width:28px;height:1px;background:var(--amber)}
+  h1{font-size:clamp(34px,5.4vw,58px);line-height:1.05;font-weight:700;letter-spacing:-.02em;max-width:18ch}
+  h1 .amber{color:var(--amber)}
+  .lede{color:var(--ink-dim);font-size:19px;max-width:62ch;margin:26px 0 36px}
+  .lede strong{color:var(--ink);font-weight:600}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:15px 24px;border-radius:8px;font-weight:600;font-size:15px;
+    border:1px solid transparent;cursor:pointer;transition:.18s;
+    font-family:var(--sans);
+  }
+  .btn-primary{background:var(--amber);color:#1a1206}
+  .btn-primary:hover{background:#f0b05a;transform:translateY(-1px)}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--amber-dim);color:var(--amber)}
+  .micro{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);letter-spacing:.04em;margin-top:18px}
+
+  /* Drop card */
+  .drop{
+    margin-top:64px;border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(180deg,var(--bg-2),#0c0d10);
+    overflow:hidden;
+  }
+  .drop-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:12px;color:var(--ink-dim);letter-spacing:.06em;
+  }
+  .drop-head .live{color:var(--ok);display:flex;align-items:center;gap:8px}
+  .drop-head .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  .drop-body{padding:30px 22px}
+  .drop-title{font-size:24px;font-weight:600;margin-bottom:6px}
+  .drop-sub{color:var(--ink-dim);margin-bottom:26px;font-family:var(--mono);font-size:13px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-radius:10px;overflow:hidden}
+  .stat{background:var(--bg-2);padding:22px 20px}
+  .stat .lbl{font-family:var(--mono);font-size:11px;color:var(--ink-dim);letter-spacing:.08em;text-transform:uppercase}
+  .stat .val{font-size:26px;font-weight:700;margin-top:8px;letter-spacing:-.01em}
+  .stat .val .small{font-size:14px;color:var(--ink-dim);font-weight:500}
+  .stat .note{font-size:12.5px;color:var(--ink-dim);margin-top:8px;font-family:var(--mono)}
+  .reveal{margin-top:22px;font-family:var(--mono);font-size:13px;color:var(--amber)}
+  .reveal code{background:rgba(232,161,58,.08);padding:2px 7px;border-radius:4px;color:var(--amber)}
+
+  /* Section generic */
+  section.block{padding:84px 0;border-top:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:14px}
+  h2{font-size:clamp(26px,3.6vw,38px);font-weight:700;letter-spacing:-.015em;max-width:24ch}
+  .sub{color:var(--ink-dim);font-size:17px;max-width:60ch;margin-top:14px}
+
+  /* vs block */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-top:42px;border-radius:14px;overflow:hidden}
+  .col{background:var(--bg-2);padding:34px 30px}
+  .col h3{font-size:18px;margin-bottom:6px;font-weight:600}
+  .col .who{font-family:var(--mono);font-size:12px;color:var(--ink-dim);margin-bottom:20px;letter-spacing:.04em}
+  .col ul{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .col li{display:flex;gap:11px;font-size:14.5px;color:var(--ink-dim)}
+  .col li svg{flex-shrink:0;margin-top:3px}
+  .col.them{opacity:.92}
+  .col.us{background:linear-gradient(180deg,#13110b,#0c0d10);position:relative}
+
+  /* Units (agents) */
+  .units{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:42px}
+  .unit{border:1px solid var(--line);border-radius:12px;padding:22px;background:var(--bg-2);transition:.18s}
+  .unit:hover{border-color:var(--amber-dim);transform:translateY(-2px)}
+  .unit .ico{font-size:24px}
+  .unit h4{font-size:16px;margin:12px 0 4px;font-weight:600;font-family:var(--mono);letter-spacing:.02em}
+  .unit .id{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:.1em;text-transform:uppercase}
+  .unit p{color:var(--ink-dim);font-size:13.5px;margin-top:8px}
+
+  /* Waitlist */
+  .waitlist{padding:90px 0;text-align:center;border-top:1px solid var(--line);
+    background:radial-gradient(600px 400px at 50% 0%,rgba(232,161,58,.08),transparent 70%)}
+  .waitlist h2{margin:0 auto;max-width:20ch}
+  .waitlist .sub{margin:16px auto 0}
+  form{max-width:480px;margin:34px auto 0;display:flex;gap:10px;background:var(--bg-2);
+    border:1px solid var(--line);border-radius:10px;padding:7px}
+  form input{flex:1;background:transparent;border:none;outline:none;color:var(--ink);
+    font-size:15px;padding:11px 14px;font-family:var(--sans)}
+  form input::placeholder{color:var(--ink-dim)}
+  form button{background:var(--amber);color:#1a1206;border:none;border-radius:7px;padding:11px 22px;
+    font-weight:600;cursor:pointer;font-size:14.5px;font-family:var(--sans);white-space:nowrap}
+  form button:hover{background:#f0b05a}
+  .gated{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);margin-top:16px;letter-spacing:.05em}
+  #ok{display:none;color:var(--ok);font-family:var(--mono);font-size:13px;margin-top:18px}
+  .consent{flex-basis:100%;display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:11.5px;line-height:1.5;color:var(--ink-dim);padding:4px 8px 6px}
+  .consent input{flex:0 0 auto;margin-top:3px;width:14px;height:14px;accent-color:var(--amber)}
+  .consent span{display:block}
+  .legal-links{display:flex;flex-wrap:wrap;gap:14px;margin:18px 0;font-size:12px}
+
+  footer{padding:42px 0;border-top:1px solid var(--line);font-family:var(--mono);font-size:12px;color:var(--ink-dim)}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+
+  @media(max-width:760px){
+    .grid3{grid-template-columns:1fr}
+    .vs{grid-template-columns:1fr}
+    .topbar nav{display:none}
+    h1{font-size:36px}
+    form{flex-direction:column;padding:12px}
+    form button{width:100%}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>OPERATOR ROSTER</div>
+    <nav>
+      <a href="#drop">Manifest</a>
+      <a href="#units">Unités</a>
+      <a href="#vs">Différence</a>
+      <a href="#join">Rejoindre</a>
+    </nav>
+    <div class="roster-count">Roster · ouverture à venir</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Drop incoming · Niche Canicule 2026</span>
+    <h1>Les <span class="amber">agents</span> analysent.<br>Vous exécutez.</h1>
+    <p class="lede">
+      Les autres vous vendent un <strong>cours</strong> sur l'import-export.
+      Le Roster vous livre un <strong>système d'agents IA</strong> qui analysent les sources,
+      calculent les <strong>coûts complets réels</strong>, signalent les exigences de conformité probables
+      et dressent le manifeste — pour que vous signiez en connaissance de cause, après validation par les professionnels compétents.
+    </p>
+    <div class="cta-row">
+      <a href="#join" class="btn btn-primary">Rejoindre la waitlist →</a>
+      <a href="#drop" class="btn btn-ghost">Voir le manifest en cours</a>
+    </div>
+    <p class="micro">EMAIL-GATED · ACCÈS ROSTER UNIQUEMENT · AUCUN BULLSHIT DROPSHIPPING</p>
+  </div>
+</header>
+
+<!-- DROP CARD -->
+<section class="wrap" id="drop">
+  <div class="drop">
+    <div class="drop-head">
+      <span>MANIFEST · DROP-001 · CANICULE EU</span>
+      <span class="live">EN DÉVELOPPEMENT · BÊTA FERMÉE</span>
+    </div>
+    <div class="drop-body">
+      <div class="drop-title">Refroidisseur d'air évaporatif portable</div>
+      <div class="drop-sub">SKU 001 · source 1688 identifiée (à valider) · HS 8414.59 indicatif · fenêtre de commande estimée 9 semaines</div>
+      <div class="grid3">
+        <div class="stat">
+          <div class="lbl">Prix usine (FOB)</div>
+          <div class="val">20<span class="small"> €</span></div>
+          <div class="note">155¥ · 1688 · source YouTube croisée</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Coût import réel</div>
+          <div class="val">30–35<span class="small"> €</span></div>
+          <div class="note">×1.5–1.7 · douane+TVA+transport</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Prix marché EU</div>
+          <div class="val">70–150<span class="small"> €</span></div>
+          <div class="note">marge nette réaliste : 15–25 %</div>
+        </div>
+      </div>
+      <p class="reveal">→ Les inscrits à la bêta pourront recevoir, selon disponibilité, le <code>fournisseur identifié à valider</code>, le <code>code HS indicatif</code>, le <code>calcul de marge en 3 scénarios</code> et la <code>checklist qualité à exiger</code>. <a href="#join" style="color:var(--amber);text-decoration:underline">Rejoindre la waitlist →</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- VS -->
+<section class="block" id="vs">
+  <div class="wrap">
+    <div class="eyebrow">Comparaison d'approche</div>
+    <h2>Formation e-commerce/import vs analyse opérationnelle par agents IA</h2>
+    <p class="sub">Certaines offres du marché sont conçues pour transmettre une méthode, des vidéos, des templates ou un accompagnement. Operator Roster se positionne différemment : il aide à analyser un projet d'import avec des critères structurés, des scénarios chiffrés et des garde-fous de décision. Comparaison fondée sur la nature des approches — pas un jugement de valeur.</p>
+    <div class="vs">
+      <div class="col them">
+        <h3>Approche formation classique</h3>
+        <div class="who">Apprentissage, méthode, contenu pédagogique</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg><strong>Objectif : apprendre.</strong> L'utilisateur reçoit une méthode, puis collecte, vérifie et interprète lui-même les données de son projet.</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg><strong>Calcul souvent manuel.</strong> Le prix FOB peut être étudié, mais le coût complet (transport, douane, TVA, commissions, retours, stockage) reste à consolider par l'utilisateur.</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg><strong>Scénarios à recalculer.</strong> MOQ, incoterm, taux de change et marge cible doivent être comparés dans un tableur séparé.</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg><strong>Décision exposée aux biais.</strong> Une opportunité peut paraître attractive si certains coûts ou hypothèses ne sont pas documentés de façon homogène.</li>
+        </ul>
+      </div>
+      <div class="col us">
+        <h3>Operator Roster (agents IA)</h3>
+        <div class="who">5 unités · anti-biais intégré · analyse semi-automatisée (bêta)</div>
+        <ul>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg><strong>Objectif : analyser.</strong> Les agents structurent les informations du projet, organisent les hypothèses et produisent une base de décision exploitable avant engagement.</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg><strong>Coût complet.</strong> Le Roster aide à intégrer les composantes pertinentes : produit, fret, droits de douane, TVA, commissions, retours, stockage et marge nette estimée.</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg><strong>Scénarios comparables.</strong> Comparez plusieurs hypothèses : MOQ, incoterm, fret, taux de change, prix de vente, niveau de stock et seuil de rentabilité.</li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg><strong>Anti-biais de décision.</strong> Le système met en évidence les hypothèses sensibles, les coûts oubliés et les scénarios défavorables avant validation.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:24px;font-size:13px;font-style:italic">Operator Roster ne remplace pas un conseil juridique, fiscal, douanier, financier ou un organisme notifié (SGS, Bureau Veritas). Il aide à structurer l'analyse d'un projet d'import avant décision.</p>
+  </div>
+</section>
+
+<!-- UNITS -->
+<section class="block" id="units">
+  <div class="wrap">
+    <div class="eyebrow">Le système</div>
+    <h2>Cinq unités. Une chaîne complète.</h2>
+    <p class="sub">Chaque agent a un anti-biais calibré selon la fiabilité de sa source. Le Legal & Fiscal est en alerte critique sur les promesses « Hong Kong 0 % d'impôts ».</p>
+    <div class="units">
+      <div class="unit"><div class="ico">🏭</div><div class="id">UNIT-01</div><h4>SOURCING</h4><p>1688, Alibaba, Canton Fair. Prix FOB ET coût complet. Négociation MOQ.</p></div>
+      <div class="unit"><div class="ico">🚢</div><div class="id">UNIT-02</div><h4>LOGISTIQUE</h4><p>Containers, incoterms, transitaires, assurance cargo. La source la plus fiable.</p></div>
+      <div class="unit"><div class="ico">⚖️</div><div class="id">UNIT-03</div><h4>LEGAL & FISCAL</h4><p>Statuts, TVA, douane, certifications CE/RoHS. Anti-biais CRITICAL.</p></div>
+      <div class="unit"><div class="ico">📊</div><div class="id">UNIT-04</div><h4>MARKET</h4><p>Marges corrigées, test saturation obligatoire, 3 scénarios systématiques.</p></div>
+      <div class="unit"><div class="ico">🎨</div><div class="id">UNIT-05</div><h4>BRAND</h4><p>Private label, OEM/ODM, packaging. Budgets réels, pas rêve « mini-brand ».</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist" id="join">
+  <div class="wrap">
+    <div class="eyebrow">Rejoindre le Roster</div>
+    <h2>Le prochain manifest arrive.<br>Les operators le reçoivent en premier.</h2>
+    <p class="sub">Pas de spam. Un email lorsque des informations de bêta ou un drop sont prêts à être partagés — fournisseur identifié à valider, prix indicatif, scénarios de marge et checklist qualité.</p>
+    <form id="wl">
+      <input type="email" id="em" placeholder="votre@email.com" required />
+      <button type="submit">Rejoindre la waitlist</button>
+      <label class="consent">
+        <input type="checkbox" id="consent" required />
+        <span>J'accepte de recevoir les emails Operator Roster relatifs à la bêta, aux drops et aux actualités du système. Je peux me désinscrire à tout moment.</span>
+      </label>
+    </form>
+    <p class="gated">EMAIL-GATED · ROSTER ONLY · DÉSABONNEMENT EN 1 CLIC</p>
+    <p class="gated" style="margin-top:8px;max-width:560px;margin-left:auto;margin-right:auto">Données utilisées pour gérer la waitlist et envoyer les notifications Operator Roster. Base légale : consentement (RGPD art. 6.1.a). Voir <a href="confidentialite.html" style="color:var(--amber-dim);text-decoration:underline">politique de confidentialité</a> et <a href="cgu.html" style="color:var(--amber-dim);text-decoration:underline">CGU bêta</a>.</p>
+    <p id="ok">✓ Demande prise en compte. Vous recevrez les prochaines informations de bêta.</p>
+  </div>
+</section>
+
+<footer id="legal">
+  <div class="wrap">
+    <div>OPERATOR ROSTER · IMPORT SYSTEM · <span id="yr">2026</span></div>
+    <div>Système d'agents IA · Outil d'aide à l'analyse · Bêta fermée</div>
+  </div>
+  <div class="wrap legal-links">
+    <a href="mentions-legales.html" style="color:var(--amber);text-decoration:underline">Mentions légales</a>
+    <a href="confidentialite.html" style="color:var(--amber);text-decoration:underline">Confidentialité</a>
+    <a href="cgu.html" style="color:var(--amber);text-decoration:underline">CGU bêta</a>
+    <a href="../NOTICE-SOURCES.md" style="color:var(--amber);text-decoration:underline">Sources</a>
+    <a href="../POLITIQUE-CITATION.md" style="color:var(--amber);text-decoration:underline">Citations</a>
+  </div>
+  <div class="wrap" style="margin-top:18px;font-size:11px;line-height:1.7;color:#5b626e;max-width:760px">
+    <strong style="color:var(--ink-dim)">Avertissement.</strong>
+    Operator Roster est un <em>outil d'aide à l'analyse et à la décision</em>. Il ne constitue pas un conseil juridique, fiscal, comptable, douanier, financier ou réglementaire personnalisé. Les informations, scénarios, estimations, codes HS indicatifs, fournisseurs identifiés et checklists doivent être vérifiés auprès de professionnels compétents (transitaire, expert-comptable, avocat, organisme notifié SGS/Bureau Veritas) avant toute décision d'achat, d'importation, de vente ou de mise sur le marché. Sources publiques : vidéos YouTube, plateformes B2B, documents publics et sources professionnelles (voir <a href="../NOTICE-SOURCES.md" style="color:var(--amber-dim);text-decoration:underline">notice des sources</a>).<br><br>
+    <strong style="color:var(--ink-dim)">Bêta fermée.</strong> L'inscription à la waitlist ne constitue pas une commande. Aucune vente immédiate n'est proposée sur cette page.
+  </div>
+</footer>
+
+<script>
+  // Démo locale — AUCUN email n'est stocké côté navigateur.
+  // À brancher sur un prestataire email conforme RGPD avant ouverture réelle.
+  const f=document.getElementById('wl'),ok=document.getElementById('ok'),em=document.getElementById('em'),consent=document.getElementById('consent');
+  f.addEventListener('submit',e=>{
+    e.preventDefault();
+    if(!consent || !consent.checked){
+      alert('Veuillez cocher la case de consentement pour rejoindre la waitlist.');
+      return;
+    }
+    // Ici : remplacer par un appel backend / prestataire email (ConvertKit, Buttondown, Brevo…).
+    // Ne PAS utiliser localStorage pour stocker l'adresse email.
+    f.style.display='none';
+    ok.style.display='block';
+  });
+  document.getElementById('yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>

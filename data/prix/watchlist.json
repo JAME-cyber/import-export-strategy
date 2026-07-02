@@ -1,0 +1,12 @@
+[
+  {
+    "id": "p001",
+    "query": "climatiseur portatif",
+    "platform": "alibaba",
+    "target_price_eur": 35.0,
+    "added_at": "2026-05-23T20:57:10.854685",
+    "last_scan": null,
+    "last_price": null,
+    "alert": false
+  }
+]

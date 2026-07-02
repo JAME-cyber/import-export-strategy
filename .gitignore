@@ -1,0 +1,17 @@
+# ARCHIVE JURIDIQUE — transcripts YouTube bruts (droits d'auteur tiers)
+# Ces fichiers NE DOIVENT PAS être distribués ni exposés publiquement.
+# Voir audit juridique : scripts/audit-juridique-gpt5.md
+.archive/
+
+# Cache & build
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+dist/
+build/
+
+# Config locale
+.env
+.env.local
+*.local

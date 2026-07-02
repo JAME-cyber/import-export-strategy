@@ -1,0 +1,116 @@
+# ImportExport Pro — Configuration Agents v2 (avec anti-biais)
+# Tous les agents chargent COMMUN-ANTI-BAIS.md en premier
+
+anti_bias:
+  module: "agents/COMMUN-ANTI-BAIS.md"
+  enabled: true
+  version: "2.0"
+  
+  # Conflits d'intérêt des sources (injecté dans chaque agent)
+  source_bias:
+    StartBusinessWorld:
+      conflict: "Vend formation 'Sourcing Pro' + services création société"
+      reliability: "⚠️ PARTIEL"
+      bias_type: "minimise difficulté, maximise enthousiasme"
+    SINOSOURCING:
+      conflict: "Vend accompagnement 'Incubator' + services logistiques"
+      reliability: "⚠️ PARTIEL"
+      bias_type: "exagère risques pour vendre protection, crée urgence"
+    Sebastien:
+      conflict: "Vend formations e-commerce/dropshipping"
+      reliability: "⚠️ PARTIEL"
+      bias_type: "vend le rêve e-commerce, lifestyle marketing"
+    CargoFamily:
+      conflict: "AUCUN (podcast professionnel gratuit)"
+      reliability: "✅ FIABLE"
+      bias_type: "aucun biais identifié"
+    LineBorrajo:
+      conflict: "Vend méthode de création de marque"
+      reliability: "⚠️ PARTIEL"
+      bias_type: "présente ses succès comme reproductibles"
+
+  # Tables de correction automatiques
+  price_correction:
+    fob_to_real_multiplier: 1.4  # FOB × 1.4 = coût complet minimum
+    fob_to_real_max: 1.6
+    marketing_b2c_pct: 0.20      # 20% du CA en marketing B2C
+    marketing_b2b_pct: 0.05      # 5% du CA en marketing B2B
+    returns_pct: 0.08            # 8% retours moyen
+    platform_fees_pct: 0.15      # 15% frais plateforme (Amazon FBA etc.)
+
+  # Tables de correction des marges
+  margin_correction:
+    youtube_brute_to_nette: 0.25  # Marge YouTube × 0.25 = marge nette réaliste
+    scenarios:
+      worst_probability: 0.40
+      median_probability: 0.40
+      best_probability: 0.20
+
+agents:
+  sourcing:
+    name: "🏭 Sourcing Master v2"
+    description: "Expert sourçage Chine — avec alerte biais prix FOB vs coût réel"
+    version: "2.0"
+    anti_bias_level: "HIGH"  # Source principale biaisée
+    context_files:
+      - "agents/COMMUN-ANTI-BAIS.md"
+      - "agents/sourcing-master/AGENT.md"
+      - "synthesis/01-SOURCING-ACHATS-CHINE.md"
+      - "synthesis/06-ANALYSE-DIVERGENTE.md"
+    temperature: 0.3
+
+  logistique:
+    name: "🚢 Logistique Pro v2"
+    description: "Expert logistique — agent le plus fiable (source neutre)"
+    version: "2.0"
+    anti_bias_level: "LOW"  # Source CargoFamily = neutre
+    context_files:
+      - "agents/COMMUN-ANTI-BAIS.md"
+      - "agents/logistique-pro/AGENT.md"
+      - "synthesis/02-LOGISTIQUE-TRANSPORT.md"
+      - "synthesis/06-ANALYSE-DIVERGENTE.md"
+    temperature: 0.2
+
+  legal:
+    name: "⚖️ Legal & Fiscal v2"
+    description: "Expert juridique — alerte spéciale sur Hong Kong '0% impôts'"
+    version: "2.0"
+    anti_bias_level: "CRITICAL"  # Source vend création HK Ltd
+    context_files:
+      - "agents/COMMUN-ANTI-BAIS.md"
+      - "agents/legal-fiscal/AGENT.md"
+      - "synthesis/03-JURIDIQUE-FISCALITE.md"
+      - "synthesis/06-ANALYSE-DIVERGENTE.md"
+    temperature: 0.2
+
+  market:
+    name: "📊 Market Analyzer v2"
+    description: "Expert marché — marges corrigées, test saturation obligatoire"
+    version: "2.0"
+    anti_bias_level: "HIGH"  # Marges YouTube très gonflées
+    context_files:
+      - "agents/COMMUN-ANTI-BAIS.md"
+      - "agents/market-analyzer/AGENT.md"
+      - "synthesis/05-MARCHES-OPPORTUNITES.md"
+      - "synthesis/06-ANALYSE-DIVERGENTE.md"
+    temperature: 0.4
+
+  brand:
+    name: "🎨 Brand Builder v2"
+    description: "Expert marques — budgets réels, pas rêve 'mini-brand'"
+    version: "2.0"
+    anti_bias_level: "HIGH"  # Sources vendent toutes quelque chose
+    context_files:
+      - "agents/COMMUN-ANTI-BAIS.md"
+      - "agents/brand-builder/AGENT.md"
+      - "synthesis/04-MARQUES-BUSINESS-MODELS.md"
+      - "synthesis/06-ANALYSE-DIVERGENTE.md"
+    temperature: 0.5
+
+# Format de sortie obligatoire pour TOUS les agents
+output_format: |
+  1. ✅ RÉPONSE DIRECTE (ce que vous voulez savoir)
+  2. ⚠️ BIAIS & RÉSERVES (ce que les sources ne disent pas)
+  3. 📊 3 SCÉNARIOS (pire 40% / médian 40% / optimiste 20%)
+  4. 💣 KILL FACTORS (top 3 risques mortels)
+  5. 🏁 VERDICT (OUI / OUI MAIS / NON / PAS ENCORE)

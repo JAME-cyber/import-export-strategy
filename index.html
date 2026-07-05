@@ -716,8 +716,15 @@ body::before {
   .phase-tabs { flex-direction: column; }
 }
 </style>
-<!-- PageAgent — AI copilot by Alibaba -->
-<script src="https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js" crossorigin="true"></script>
+<!-- PageAgent — AI copilot by Alibaba (manual init for French) -->
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js?autoInit=false" crossorigin="true"></script>
+<script>
+  window.addEventListener('load', () => {
+    if (window.PageAgent) {
+      new window.PageAgent({ language: 'fr-FR' });
+    }
+  });
+</script>
 
 <!-- Leaflet.js for interactive map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />

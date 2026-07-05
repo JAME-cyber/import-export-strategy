@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte Stratégique Import-Export</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2336;
+  --border: #1e293b;
+  --border-active: #f59e0b;
+  --gold: #f59e0b;
+  --gold-light: #fbbf24;
+  --gold-dark: #d97706;
+  --emerald: #10b981;
+  --emerald-light: #34d399;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --purple: #8b5cf6;
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ambient background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: 
+    radial-gradient(ellipse at 20% 0%, rgba(245, 158, 11, 0.08), transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(16, 185, 129, 0.06), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.04), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ HEADER ═══ */
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gold-light);
+  margin-bottom: 20px;
+}
+
+.header-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+  50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+}
+
+.header h1 {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header p {
+  color: var(--text-dim);
+  font-size: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ═══ STATS BAR ═══ */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(245, 158, 11, 0.3);
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ═══ PHASE TABS ═══ */
+.phase-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.phase-tab {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.phase-tab:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.phase-tab.active {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.02));
+}
+
+.phase-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+}
+
+.phase-tab-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phase-tab.active .phase-tab-label { color: var(--gold); }
+
+.phase-tab-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.phase-tab-period {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* ═══ COUNTRY GRID ═══ */
+.country-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+.country-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.country-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.country-header {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.country-flag {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.country-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.country-info .region {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.priority-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.priority-p1 { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.priority-p2 { background: rgba(245, 158, 11, 0.15); color: var(--gold-light); border: 1px solid rgba(245, 158, 11, 0.3); }
+.priority-p3 { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+.country-body {
+  padding: 20px 24px;
+  flex: 1;
+}
+
+.product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.product-row:last-child { border-bottom: none; }
+.product-row:hover { padding-left: 8px; }
+
+.product-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.product-icon { font-size: 18px; }
+
+.product-margin {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.margin-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.margin-high { background: rgba(16, 185, 129, 0.15); color: var(--emerald-light); }
+.margin-mid { background: rgba(245, 158, 11, 0.15); color: var(--gold-light); }
+
+/* Metrics */
+.country-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px 24px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.metric {
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+}
+
+/* Tags */
+.country-tags {
+  padding: 12px 24px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+
+.tag-green { background: rgba(16, 185, 129, 0.1); color: var(--emerald-light); border: 1px solid rgba(16, 185, 129, 0.2); }
+.tag-yellow { background: rgba(245, 158, 11, 0.1); color: var(--gold-light); border: 1px solid rgba(245, 158, 11, 0.2); }
+.tag-red { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+.tag-blue { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+.tag-purple { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.2); }
+
+/* ═══ SYNERGY SECTION ═══ */
+.synergy-section {
+  margin-top: 56px;
+}
+
+.section-title {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  color: var(--text-dim);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+.synergy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.synergy-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.synergy-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 0 0 16px 16px;
+}
+
+.synergy-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.synergy-socialpulse::after { background: linear-gradient(90deg, var(--blue), #2563eb); }
+
+.synergy-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.icon-socialpulse { background: rgba(59, 130, 246, 0.15); }
+
+.synergy-card h4 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.synergy-card p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.synergy-benefit {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ═══ ECONOMICS CALCULATOR ═══ */
+.economics-section {
+  margin-top: 56px;
+}
+
+.economics-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.econ-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.econ-tab {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.econ-tab:hover { color: var(--text); }
+.econ-tab.active { background: var(--gold); color: #000; border-color: var(--gold); }
+
+.econ-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .econ-grid { grid-template-columns: 1fr; }
+}
+
+.eon-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.econ-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.econ-item-label { display: flex; align-items: center; gap: 8px; }
+.econ-item-value { font-weight: 700; font-variant-numeric: tabular-nums; }
+.econ-item.negative .econ-item-value { color: #f87171; }
+
+.econ-bar-container {
+  height: 24px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 20px;
+  display: flex;
+}
+
+.econ-bar-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #000;
+  transition: width 0.5s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.econ-result {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.02));
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.econ-result-value {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--emerald-light);
+  font-variant-numeric: tabular-nums;
+}
+
+.econ-result-label {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* ═══ TIMELINE ═══ */
+.timeline-section {
+  margin-top: 56px;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 32px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--gold), var(--emerald), var(--blue));
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -28px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--gold);
+}
+
+.timeline-item.p2::before { border-color: var(--emerald); }
+.timeline-item.p3::before { border-color: var(--blue); }
+
+.timeline-phase {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.timeline-phase.p1 { color: var(--gold); }
+.timeline-phase.p2 { color: var(--emerald); }
+.timeline-phase.p3 { color: var(--blue); }
+
+.timeline-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.timeline-content h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.timeline-content p {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* ═══ PRODUCT DETAIL MODAL ═══ */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.modal-close {
+  float: right;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.modal h2 { font-size: 24px; margin-bottom: 4px; }
+.modal-region { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+
+.modal-section { margin-bottom: 20px; }
+.modal-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.modal-data-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(30, 41, 59, 0.5);
+  font-size: 14px;
+}
+
+.modal-data-row:last-child { border-bottom: none; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  margin-top: 64px;
+  padding: 32px;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.country-card, .synergy-card, .stat-card {
+  animation: fadeInUp 0.5s ease backwards;
+}
+
+.country-card:nth-child(1) { animation-delay: 0.05s; }
+.country-card:nth-child(2) { animation-delay: 0.1s; }
+.country-card:nth-child(3) { animation-delay: 0.15s; }
+.country-card:nth-child(4) { animation-delay: 0.2s; }
+.country-card:nth-child(5) { animation-delay: 0.25s; }
+.country-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* Responsive */
+@media (max-width: 640px) {
+  .header h1 { font-size: 28px; }
+  .country-grid { grid-template-columns: 1fr; }
+  .phase-tabs { flex-direction: column; }
+}
+</style>
+<!-- Leaflet.js for interactive map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+/* ═══ MAP SECTION ═══ */
+.map-section {
+  margin-bottom: 40px;
+}
+
+.map-container {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  height: 520px;
+}
+
+#worldMap {
+  width: 100%;
+  height: 100%;
+  background: #0d1117;
+}
+
+/* Override Leaflet dark theme */
+.leaflet-container {
+  background: #0d1117 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.leaflet-tile {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(1.1) saturate(0.7);
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 500;
+  background: rgba(10, 14, 26, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 13px;
+  min-width: 180px;
+}
+
+.map-legend-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  color: var(--text-dim);
+}
+
+.legend-item:last-child { margin-bottom: 0; }
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-line {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.map-phase-filter {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 500;
+  display: flex;
+  gap: 6px;
+}
+
+.map-phase-btn {
+  background: rgba(10, 14, 26, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-phase-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+.map-phase-btn.active {
+  background: var(--gold);
+  color: #000;
+  border-color: var(--gold);
+}
+
+/* Custom marker popups */
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.leaflet-popup-content {
+  margin: 16px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popup-region {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+.popup-products {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.popup-product-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+}
+
+.popup-margin { color: var(--emerald-light); font-weight: 700; }
+
+/* Custom marker div */
+.custom-marker {
+  background: transparent;
+  border: none;
+}
+
+.marker-pin {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+}
+
+.marker-pin:hover {
+  transform: rotate(-45deg) scale(1.15);
+  z-index: 1000;
+}
+
+.marker-pin span {
+  transform: rotate(45deg);
+  font-size: 16px;
+}
+
+.marker-p1 { background: #ef4444; }
+.marker-p2 { background: #f59e0b; }
+.marker-p3 { background: #3b82f6; }
+.marker-market { background: #10b981; }
+
+.marker-pulse {
+  position: absolute;
+  top: -2px; left: -2px;
+  width: 40px; height: 40px;
+  border-radius: 50% 50% 50% 0;
+  animation: marker-pulse-anim 2s infinite;
+  opacity: 0.5;
+}
+
+.marker-p1 .marker-pulse { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+.marker-p2 .marker-pulse { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+
+@keyframes marker-pulse-anim {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- ═══════ HEADER ═══════ -->
+<div class="header">
+  <div class="header-badge">Stratégie Active — Juillet 2026</div>
+  <h1>🌍 Carte Stratégique Import-Export</h1>
+  <p>Sourcing multi-pays → Marchés FR / CH / EU. Opportunités classées par priorité, marge et synergie projets.</p>
+</div>
+
+<!-- ═══════ STATS ═══════ -->
+<div class="stats-bar">
+  <div class="stat-card">
+    <div class="stat-value">6</div>
+    <div class="stat-label">Pays Sources</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">15+</div>
+    <div class="stat-label">Produits Identifiés</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">x5-10</div>
+    <div class="stat-label">Marge Brute Moyenne</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">1</div>
+    <div class="stat-label">Synergies Projets</div>
+  </div>
+</div>
+
+<!-- ═══════ WORLD MAP ═══════ -->
+<div class="map-section">
+  <h2 class="section-title" style="font-size: 24px; margin-bottom: 8px;">🗺️ Carte Géographique — Trade Routes</h2>
+  <p class="section-subtitle" style="margin-bottom: 20px;">Pays sources → Marchés cibles FR/CH. Cliquer sur un marqueur pour les détails.</p>
+  
+  <div class="map-container">
+    <div id="worldMap"></div>
+    
+    <div class="map-phase-filter">
+      <div class="map-phase-btn active" onclick="filterMapPhase('all', this)">Toutes</div>
+      <div class="map-phase-btn" onclick="filterMapPhase('p1', this)">Phase 1</div>
+      <div class="map-phase-btn" onclick="filterMapPhase('p2', this)">Phase 2</div>
+      <div class="map-phase-btn" onclick="filterMapPhase('p3', this)">Phase 3</div>
+    </div>
+    
+    <div class="map-legend">
+      <div class="map-legend-title">Légende</div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #ef4444;"></div>
+        Phase 1 — Lancement
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #f59e0b;"></div>
+        Phase 2 — Expansion
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #3b82f6;"></div>
+        Phase 3 — Premium
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #10b981;"></div>
+        Marché cible (FR/CH)
+      </div>
+      <div class="legend-item" style="margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px;">
+        <div class="legend-line" style="background: linear-gradient(90deg, #ef4444, #10b981);"></div>
+        Route commerciale
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PHASE TABS ═══════ -->
+<div class="phase-tabs">
+  <div class="phase-tab active" onclick="filterPhase('all', this)">
+    <div class="phase-tab-label">██ Vue Globale</div>
+    <div class="phase-tab-title">Toutes Phases</div>
+    <div class="phase-tab-period">2026 — 2027</div>
+  </div>
+  <div class="phase-tab" onclick="filterPhase('p1', this)">
+    <div class="phase-tab-label">Phase 1</div>
+    <div class="phase-tab-title">Lancement Immédiat</div>
+    <div class="phase-tab-period">Q3 2026</div>
+  </div>
+  <div class="phase-tab" onclick="filterPhase('p2', this)">
+    <div class="phase-tab-label">Phase 2</div>
+    <div class="phase-tab-title">Expansion</div>
+    <div class="phase-tab-period">Q4 2026</div>
+  </div>
+  <div class="phase-tab" onclick="filterPhase('p3', this)">
+    <div class="phase-tab-label">Phase 3</div>
+    <div class="phase-tab-title">Premium & Scale</div>
+    <div class="phase-tab-period">2027</div>
+  </div>
+</div>
+
+<!-- ═══════ COUNTRY GRID ═══════ -->
+<div class="country-grid" id="countryGrid"></div>
+
+<!-- ═══════ SYNERGIES ═══════ -->
+<div class="synergy-section">
+  <h2 class="section-title">🔗 Synergies Cross-Projets</h2>
+  <p class="section-subtitle">L'import-export n'est pas isolé — il nourrit et alimente les autres business units</p>
+  
+  <div class="synergy-grid">
+    <div class="synergy-card synergy-socialpulse">
+      <div class="synergy-icon icon-socialpulse">📡</div>
+      <h4>SocialPulse</h4>
+      <p>Lead gen B2B pour trouver distributeurs/grossistes EU. SocialPulse devient l'outil de prospection interne pour identifier les acheteurs.</p>
+      <div class="synergy-benefit" style="color: #60a5fa">🎯 Outil de prospection interne</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ ECONOMICS CALCULATOR ═══════ -->
+<div class="economics-section">
+  <h2 class="section-title">📊 Unit Economics</h2>
+  <p class="section-subtitle">Décomposition du prix de vente par modèle logistique (basé sur prix export × 2.5-3)</p>
+
+  <div class="economics-card">
+    <div class="econ-tabs">
+      <div class="econ-tab active" onclick="switchEcon('dropship', this)">🚚 Drop Ship (depuis source)</div>
+      <div class="econ-tab" onclick="switchEcon('fba', this)">📦 FBA (Amazon Warehouse)</div>
+      <div class="econ-tab" onclick="switchEcon('shipx', this)">🤝 Enablement (ShipRocketX)</div>
+    </div>
+
+    <div class="econ-grid">
+      <div>
+        <div class="eon-breakdown" id="econBreakdown"></div>
+        <div class="econ-bar-container" id="econBar"></div>
+      </div>
+      <div>
+        <div class="econ-result">
+          <div class="econ-result-value" id="econMargin">30%</div>
+          <div class="econ-result-label" id="econMarginLabel">Marge Nette (avant pub)</div>
+        </div>
+        <div style="margin-top: 16px; font-size: 13px; color: var(--text-dim); line-height: 1.6;" id="econNotes">
+          Investir 20% dans la pub en phase initiale → 10% net en poche (équivalent 30% marge locale).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ TIMELINE ═══════ -->
+<div class="timeline-section">
+  <h2 class="section-title">📅 Roadmap</h2>
+  <p class="section-subtitle">Du test à l'échelle — séquencé pour minimiser le risque</p>
+
+  <div class="timeline">
+    <div class="timeline-item p1">
+      <div class="timeline-phase p1">Phase 1 — Q3 2026</div>
+      <div class="timeline-content">
+        <h4>🇩🇿 Algérie → Dattes + 🇻🇳 Vietnam → Badiane & Cannelle</h4>
+        <p>Test du modèle. Compliance simple (épices séchées, dattes). Budget : 2-5k€. Objectif : valider供应链 + premiers clients FR/CH.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item p2">
+      <div class="timeline-phase p2">Phase 2 — Q4 2026</div>
+      <div class="timeline-content">
+        <h4>🇩🇿 Huile figue barbarie + 🇸🇳 Karité Sénégal + 🇻🇳 Poivre</h4>
+        <p>Expansion cosmétique bio. Budget : 10-15k€. Lancement marque propre.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item p3">
+      <div class="timeline-phase p3">2027</div>
+      <div class="timeline-content">
+        <h4>🇮🇩 Indonésie (girofle, curcuma) + 🇲🇬 Vanille Madagascar</h4>
+        <p>Catalogue premium complet. Lancement "Spice Box" multi-origines. Distribution B2B + D2C. Budget : 20k€+.</p>
+      </div>
+    </div>
+
+    <div class="timeline-item p3">
+      <div class="timeline-phase p3">2027+</div>
+      <div class="timeline-content">
+        <h4>🏭 Marque cosmétique intégrée</h4>
+        <p>Source → Formulation → Branding → Distribution. Vertical integration complète.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ FOOTER ═══════ -->
+<div class="footer">
+  Carte Stratégique Import-Export · Généré par Hermes Agent · Données: Tridge, UN Comtrade, ShipRocketX · Juillet 2026
+</div>
+
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script>
+// ═══════ DATA ═══════
+const countries = [
+  {
+    id: 'algeria', flag: '🇩🇿', name: 'Algérie', region: 'Afrique du Nord',
+    phase: 'p1', priority: 'P1 — Now',
+    products: [
+      { icon: '🌴', name: 'Dattes Deglet Nour', sourcePrice: '2-4€/kg', retailPrice: '12-20€/kg', margin: 'x5', marginClass: 'margin-high' },
+      { icon: '🌵', name: 'Huile figue barbarie', sourcePrice: '30-60€/L', retailPrice: '300-1000€/L', margin: 'x10', marginClass: 'margin-high' },
+    ],
+    metrics: [
+      { value: '~0€', label: 'Droits douane EU*'},
+      { value: '3-5j', label: 'Transit FR'},
+      { value: 'L/C', label: 'Paiement'},
+      { value: '🟢 Simple', label: 'Compliance'},
+    ],
+    tags: [
+      { text: 'Right to win géo', class: 'tag-green' },
+      { text: 'FR natif', class: 'tag-green' },
+      { text: 'DZD non-convertible', class: 'tag-red' },
+    ],
+    detail: {
+      'HS Code': '0804.51 (dattes) / 1515.90 (huile)',
+      'Accord EU': 'Aucun accord préférentiel → droits standard',
+      'MOQ typique': '500 kg (dattes), 50-100L (huile)',
+      'Fournisseurs clés': 'Biskra, Tolga, Ouargla',
+      'Certification': 'GlobalGAP, EU bio équivalent',
+      'Risque principal': 'DZD non-convertible → lettre de crédit obligatoire',
+    }
+  },
+  {
+    id: 'vietnam', flag: '🇻🇳', name: 'Vietnam', region: 'Asie du Sud-Est',
+    phase: 'p1', priority: 'P1 — Now',
+    products: [
+      { icon: '⭐', name: 'Badiane (Star Anise)', sourcePrice: '4.5$/kg', retailPrice: '30-45€/kg', margin: 'x7', marginClass: 'margin-high' },
+      { icon: '🟤', name: 'Cannelle Saigon', sourcePrice: '3-6$/kg', retailPrice: '30-60€/kg', margin: 'x8', marginClass: 'margin-high' },
+      { icon: '⚫', name: 'Poivre noir/blanc', sourcePrice: '3-5$/kg', retailPrice: '20-40€/kg', margin: 'x7', marginClass: 'margin-high' },
+    ],
+    metrics: [
+      { value: '0%', label: 'Douane EVFTA'},
+      { value: '25-30j', label: 'Transit maritime'},
+      { value: 'Wire', label: 'Paiement'},
+      { value: '🟢 #1', label: 'Volume mondial'},
+    ],
+    tags: [
+      { text: 'EVFTA 0% douane', class: 'tag-green' },
+      { text: '#1 mondial badiane', class: 'tag-green' },
+      { text: 'VND convertible', class: 'tag-green' },
+      { text: '552 suppliers', class: 'tag-blue' },
+    ],
+    detail: {
+      'HS Code': '0909.61 (badiane) / 0906 (cannelle) / 0904 (poivre)',
+      'Accord EU': 'EVFTA (2020) → 0% droits de douane',
+      'MOQ typique': '100-500 kg',
+      'Volume badiane': '480,000 kg/mois export (552 transactions)',
+      'Port export': 'Hai Phong → Rotterdam / Le Havre',
+      'Risque principal': 'Qualité variable → échantillon + lab test requis',
+    }
+  },
+  {
+    id: 'senegal', flag: '🇸🇳', name: 'Sénégal', region: 'Afrique de l\'Ouest',
+    phase: 'p2', priority: 'P2 — Q4 2026',
+    products: [
+      { icon: '🧴', name: 'Beurre de karité brut', sourcePrice: '3-8$/kg', retailPrice: '25-50€/kg', margin: 'x6', marginClass: 'margin-high' },
+      { icon: '🌳', name: 'Pulpe de baobab', sourcePrice: '5-10$/kg', retailPrice: '30-60€/kg', margin: 'x5', marginClass: 'margin-high' },
+    ],
+    metrics: [
+      { value: '0-5%', label: 'Douane EPA'},
+      { value: '15-20j', label: 'Transit maritime'},
+      { value: 'Wire', label: 'Paiement'},
+      { value: '🟢 Simple', label: 'Compliance'},
+    ],
+    tags: [
+      { text: 'Right to win géo', class: 'tag-green' },
+      { text: 'FR natif', class: 'tag-green' },
+      { text: 'EPA (2014)', class: 'tag-green' },
+    ],
+    detail: {
+      'HS Code': '1515.90 (karité)',
+      'Accord EU': 'EPA (Economic Partnership Agreement, 2014)',
+      'MOQ typique': '200-500 kg',
+      'Région clé': 'Casamance, Sénégal oriental',
+      'Certification': 'Bio EU, Fair Trade',
+      'Risque principal': 'Qualité extraction variable → raffinage en FR',
+    }
+  },
+  {
+    id: 'indonesia', flag: '🇮🇩', name: 'Indonésie', region: 'Asie du Sud-Est',
+    phase: 'p3', priority: 'P3 — 2027',
+    products: [
+      { icon: '🔹', name: 'Clou de girofle', sourcePrice: '5-8$/kg', retailPrice: '25-50€/kg', margin: 'x5', marginClass: 'margin-high' },
+      { icon: '🟡', name: 'Curcuma', sourcePrice: '2-4$/kg', retailPrice: '15-30€/kg', margin: 'x7', marginClass: 'margin-high' },
+      { icon: '🟤', name: 'Muscade / Macis', sourcePrice: '6-10$/kg', retailPrice: '30-60€/kg', margin: 'x5', marginClass: 'margin-high' },
+    ],
+    metrics: [
+      { value: '5-10%', label: 'Douane EU'},
+      { value: '30-35j', label: 'Transit maritime'},
+      { value: 'Wire', label: 'Paiement'},
+      { value: '🟡 Modéré', label: 'Compliance phyto'},
+    ],
+    tags: [
+      { text: '#1 mondial girofle', class: 'tag-green' },
+      { text: 'Pas d\'accord EU', class: 'tag-red' },
+      { text: 'Phyto strict', class: 'tag-yellow' },
+      { text: 'Spice Islands', class: 'tag-purple' },
+    ],
+    detail: {
+      'HS Code': '0907 (girofle) / 0910 (curcuma) / 0908 (muscade)',
+      'Accord EU': 'Aucun → droits standard (5-12%)',
+      'MOQ typique': '500+ kg',
+      'Région clé': 'Maluku (Moluques), Sulawesi',
+      'Certification': 'Phytosanitaire obligatoire (ravageurs tropicaux)',
+      'Risque principal': 'Compliance phyto stricte + délai maritime long',
+    }
+  },
+  {
+    id: 'madagascar', flag: '🇲🇬', name: 'Madagascar', region: 'Océan Indien',
+    phase: 'p3', priority: 'P3 — 2027',
+    products: [
+      { icon: '🏷️', name: 'Vanille bourbon', sourcePrice: '200-600$/kg', retailPrice: '400-1200€/kg', margin: 'x2-3', marginClass: 'margin-mid' },
+    ],
+    metrics: [
+      { value: '0-8%', label: 'Douane EPA'},
+      { value: '25-30j', label: 'Transit maritime'},
+      { value: 'Wire', label: 'Paiement'},
+      { value: '🟡 CITES', label: 'Compliance'},
+    ],
+    tags: [
+      { text: '80% mondial vanille', class: 'tag-green' },
+      { text: 'Marge ultra-premium', class: 'tag-green' },
+      { text: 'CITES requis', class: 'tag-yellow' },
+      { text: 'Volatilité prix', class: 'tag-red' },
+    ],
+    detail: {
+      'HS Code': '0905.20 (vanille)',
+      'Accord EU': 'EPA (2014)',
+      'MOQ typique': '10-50 kg (produit premium)',
+      'Région clé': 'SAVA (Sambava, Antalaha)',
+      'Certification': 'CITES (convention espèces), Bio EU',
+      'Risque principal': 'Volatilité prix extrême + chaîne d\'appro fragile',
+    }
+  },
+  {
+    id: 'turkey', flag: '🇹🇷', name: 'Turquie', region: 'Proche-Orient',
+    phase: 'p3', priority: 'P3 — Opportunité',
+    products: [
+      { icon: '🫒', name: 'Huile d\'olive premium', sourcePrice: '4-8€/L', retailPrice: '15-30€/L', margin: 'x3', marginClass: 'margin-mid' },
+      { icon: '🧶', name: 'Textile / Cuir', sourcePrice: 'Variable', retailPrice: 'Variable', margin: 'Variable', marginClass: 'margin-mid' },
+    ],
+    metrics: [
+      { value: '0%', label: 'Douane CU'},
+      { value: '7-10j', label: 'Transit routier'},
+      { value: 'Wire', label: 'Paiement'},
+      { value: '🟢 Simple', label: 'Compliance'},
+    ],
+    tags: [
+      { text: 'Customs Union EU', class: 'tag-green' },
+      { text: 'Transit rapide', class: 'tag-green' },
+      { text: 'Qualité variable', class: 'tag-yellow' },
+    ],
+    detail: {
+      'HS Code': '1509 (huile olive) / Chapitre 41-43 (cuir)',
+      'Accord EU': 'Union Douanière (1995) → 0% droits',
+      'MOQ typique': 'Flexible',
+      'Avantage': 'Transport routier direct, délai court',
+      'Risque principal': 'Concurrence intense sur textile/cuir',
+    }
+  },
+];
+
+// ═══════ RENDER ═══════
+function renderCountries(filter = 'all') {
+  const grid = document.getElementById('countryGrid');
+  const filtered = filter === 'all' ? countries : countries.filter(c => c.phase === filter);
+  
+  grid.innerHTML = filtered.map(c => `
+    <div class="country-card" data-country="${c.id}">
+      <div class="country-header">
+        <div class="country-flag">${c.flag}</div>
+        <div class="country-info">
+          <h3>${c.name}</h3>
+          <div class="region">${c.region}</div>
+        </div>
+        <div class="priority-badge priority-${c.phase}">${c.priority}</div>
+      </div>
+      <div class="country-body">
+        ${c.products.map(p => `
+          <div class="product-row" onclick="openModal('${c.id}')">
+            <div class="product-name">
+              <span class="product-icon">${p.icon}</span>
+              ${p.name}
+            </div>
+            <div class="product-margin">
+              <span style="color: var(--text-muted); font-size: 12px;">${p.sourcePrice} →</span>
+              <span class="margin-badge ${p.marginClass}">${p.margin}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="country-metrics">
+        ${c.metrics.map(m => `
+          <div class="metric">
+            <div class="metric-value">${m.value}</div>
+            <div class="metric-label">${m.label}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="country-tags">
+        ${c.tags.map(t => `<span class="tag ${t.class}">${t.text}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════ FILTER ═══════
+function filterPhase(phase, el) {
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderCountries(phase);
+}
+
+// ═══════ MODAL ═══════
+function openModal(countryId) {
+  const c = countries.find(x => x.id === countryId);
+  if (!c) return;
+  
+  const modal = document.getElementById('modalContent');
+  modal.innerHTML = `
+    <span class="modal-close" onclick="closeModal()">&times;</span>
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 4px;">
+      <span style="font-size: 40px;">${c.flag}</span>
+      <div>
+        <h2>${c.name}</h2>
+        <div class="modal-region">${c.region} · ${c.priority}</div>
+      </div>
+    </div>
+
+    <div class="modal-section" style="margin-top: 24px;">
+      <div class="modal-section-title">📦 Produits</div>
+      ${c.products.map(p => `
+        <div class="modal-data-row">
+          <span>${p.icon} ${p.name}</span>
+          <span style="color: var(--gold-light); font-weight: 700;">${p.margin} (${p.sourcePrice} → ${p.retailPrice})</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">📋 Détails Techniques</div>
+      ${Object.entries(c.detail).map(([k, v]) => `
+        <div class="modal-data-row">
+          <span style="color: var(--text-dim);">${k}</span>
+          <span style="font-weight: 600; text-align: right; max-width: 60%;">${v}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">🏷️ Tags</div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+        ${c.tags.map(t => `<span class="tag ${t.class}">${t.text}</span>`).join('')}
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+// ═══════ ECONOMICS ═══════
+const econModels = {
+  dropship: {
+    items: [
+      { label: '💰 Prix de vente (US/EU)', value: '300₹ (100₹ local × 3)', pct: 100, color: '#1e293b' },
+      { label: '🏭 COGS', value: '-30₹ (10%)', pct: 10, color: '#64748b' },
+      { label: '🚚 Shipping drop ship', value: '-120₹ (40%)', pct: 40, color: '#ef4444' },
+      { label: '🏪 Marketplace fees', value: '-60₹ (20%)', pct: 20, color: '#f59e0b' },
+      { label: '📊 Publicité', value: '-30₹ (10%)', pct: 10, color: '#8b5cf6' },
+    ],
+    margin: '20%',
+    marginLabel: 'Marge Nette',
+    notes: '<strong>Avantage:</strong> Pas de risque stock, contrôle total.<br><strong>Inconvénient:</strong> Shipping colis individuel = 40% du prix. Idéal pour tester un marché sans investir en stock.',
+    barSegments: [
+      { pct: 10, color: '#64748b', label: 'COGS 10%' },
+      { pct: 40, color: '#ef4444', label: 'Shipping 40%' },
+      { pct: 20, color: '#f59e0b', label: 'Marketplace 20%' },
+      { pct: 10, color: '#8b5cf6', label: 'Pub 10%' },
+      { pct: 20, color: '#10b981', label: 'Marge 20%' },
+    ]
+  },
+  fba: {
+    items: [
+      { label: '💰 Prix de vente (US/EU)', value: '300₹ (100₹ local × 3)', pct: 100, color: '#1e293b' },
+      { label: '🏭 COGS', value: '-30₹ (10%)', pct: 10, color: '#64748b' },
+      { label: '🚢 Shipping B2B bulk → FBA', value: '-30₹ (10%)', pct: 10, color: '#f59e0b' },
+      { label: '📦 FBA (warehouse + commission)', value: '-120₹ (40%)', pct: 40, color: '#ef4444' },
+      { label: '⚠️ Inventory risk (dead stock)', value: '-30₹ (10%)', pct: 10, color: '#f87171' },
+      { label: '📊 Publicité', value: '-30₹ (10%)', pct: 10, color: '#8b5cf6' },
+    ],
+    margin: '20%',
+    marginLabel: 'Marge Nette',
+    notes: '<strong>Avantage:</strong> Livraison rapide (Prime), scaling facile.<br><strong>Inconvénient:</strong> Stock bloqué à l\'étranger + risque invendus irrécupérables (10-30% du stock).',
+    barSegments: [
+      { pct: 10, color: '#64748b', label: 'COGS 10%' },
+      { pct: 10, color: '#f59e0b', label: 'Shipping 10%' },
+      { pct: 40, color: '#ef4444', label: 'FBA 40%' },
+      { pct: 10, color: '#f87171', label: 'Risk 10%' },
+      { pct: 10, color: '#8b5cf6', label: 'Pub 10%' },
+      { pct: 20, color: '#10b981', label: 'Marge 20%' },
+    ]
+  },
+  shipx: {
+    items: [
+      { label: '💰 Prix de vente (US/EU)', value: '300₹ (100₹ local × 3)', pct: 100, color: '#1e293b' },
+      { label: '🏭 COGS', value: '-30₹ (10%)', pct: 10, color: '#64748b' },
+      { label: '🚚 Shipping + Enablement', value: '-45₹ (15%)', pct: 15, color: '#f59e0b' },
+      { label: '📦 FBA fees', value: '-120₹ (40%)', pct: 40, color: '#ef4444' },
+      { label: '📊 Publicité', value: '-30₹ (10%)', pct: 10, color: '#8b5cf6' },
+    ],
+    margin: '25%',
+    marginLabel: 'Marge Nette (enablement)',
+    notes: '<strong>Avantage:</strong> Pas de coût setup (compliance + listing inclus). ROAS cible: 4-5x en 6-12 mois.<br><strong>Inconvénient:</strong> 5% commission ongoing. Engagement pub min 50,000₹/mois.',
+    barSegments: [
+      { pct: 10, color: '#64748b', label: 'COGS 10%' },
+      { pct: 15, color: '#f59e0b', label: 'Ship+Enable 15%' },
+      { pct: 40, color: '#ef4444', label: 'FBA 40%' },
+      { pct: 10, color: '#8b5cf6', label: 'Pub 10%' },
+      { pct: 25, color: '#10b981', label: 'Marge 25%' },
+    ]
+  }
+};
+
+function renderEcon(model) {
+  const data = econModels[model];
+  document.getElementById('econBreakdown').innerHTML = data.items.map(item => `
+    <div class="econ-item negative">
+      <div class="econ-item-label">${item.label}</div>
+      <div class="econ-item-value">${item.value}</div>
+    </div>
+  `).join('');
+  
+  document.getElementById('econBar').innerHTML = data.barSegments.map(s => `
+    <div class="econ-bar-segment" style="width: ${s.pct}%; background: ${s.color};">${s.label}</div>
+  `).join('');
+  
+  document.getElementById('econMargin').textContent = data.margin;
+  document.getElementById('econMarginLabel').textContent = data.marginLabel;
+  document.getElementById('econNotes').innerHTML = data.notes;
+}
+
+function switchEcon(model, el) {
+  document.querySelectorAll('.econ-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderEcon(model);
+}
+
+// ═══════ LEAFLET MAP ═══════
+const mapData = {
+  markets: [
+    { id: 'france', name: 'France', flag: '🇫🇷', coords: [46.6034, 2.2137], type: 'market', note: 'Marché principal — Distribution B2B + D2C' },
+    { id: 'swiss', name: 'Suisse', flag: '🇨🇭', coords: [46.8182, 8.2275], type: 'market', note: 'Marché premium — Cosmétique bio, gastronomie' },
+  ],
+  sources: [
+    { id: 'algeria', name: 'Algérie', flag: '🇩🇿', coords: [28.0339, 1.6596], phase: 'p1', region: 'Afrique du Nord',
+      products: '🌴 Dattes (x5)\n🌵 Huile figue barbarie (x10)' },
+    { id: 'vietnam', name: 'Vietnam', flag: '🇻🇳', coords: [14.0583, 108.2772], phase: 'p1', region: 'Asie du Sud-Est',
+      products: '⭐ Badiane (x7)\n🟤 Cannelle Saigon (x8)\n⚫ Poivre (x7)' },
+    { id: 'senegal', name: 'Sénégal', flag: '🇸🇳', coords: [14.4974, -14.4524], phase: 'p2', region: 'Afrique de l\'Ouest',
+      products: '🧴 Beurre karité (x6)\n🌳 Pulpe baobab (x5)' },
+    { id: 'indonesia', name: 'Indonésie', flag: '🇮🇩', coords: [-0.7893, 113.9233], phase: 'p3', region: 'Asie du Sud-Est',
+      products: '🔹 Clou girofle (x5)\n🟡 Curcuma (x7)\n🟤 Muscade (x5)' },
+    { id: 'madagascar', name: 'Madagascar', flag: '🇲🇬', coords: [-18.7669, 46.8691], phase: 'p3', region: 'Océan Indien',
+      products: '🏷️ Vanille bourbon (x2-3)' },
+    { id: 'turkey', name: 'Turquie', flag: '🇹🇷', coords: [38.9637, 35.2433], phase: 'p3', region: 'Proche-Orient',
+      products: '🫒 Huile olive (x3)\n🧶 Textile/Cuir' },
+  ]
+};
+
+let worldMap = null;
+let mapMarkers = [];
+let mapRoutes = [];
+
+function initMap() {
+  worldMap = L.map('worldMap', {
+    center: [30, 20],
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 6,
+    zoomControl: true,
+    attributionControl: false,
+    worldCopyJump: true,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19,
+  }).addTo(worldMap);
+
+  // Add source markers
+  mapData.sources.forEach(s => {
+    const colorClass = s.phase === 'p1' ? 'marker-p1' : s.phase === 'p2' ? 'marker-p2' : 'marker-p3';
+    const icon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div class="marker-pin ${colorClass}"><span>${s.flag}</span></div>`,
+      iconSize: [36, 42],
+      iconAnchor: [18, 38],
+      popupAnchor: [0, -36],
+    });
+
+    const marker = L.marker(s.coords, { icon }).addTo(worldMap);
+    marker.phase = s.phase;
+    marker.sourceId = s.id;
+
+    const productsHtml = s.products.split('\n').map(p => {
+      const [name, margin] = p.split(' (');
+      return `<div class="popup-product-row"><span>${name}</span><span class="popup-margin">${margin ? '(' + margin : ''}</span></div>`;
+    }).join('');
+
+    marker.bindPopup(`
+      <div class="popup-title">${s.flag} ${s.name}</div>
+      <div class="popup-region">${s.region} · Phase ${s.phase.slice(1)}</div>
+      <div class="popup-products">${productsHtml}</div>
+    `);
+
+    mapMarkers.push(marker);
+  });
+
+  // Add market markers (destinations)
+  mapData.markets.forEach(m => {
+    const icon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div class="marker-pin marker-market"><span>${m.flag}</span></div>`,
+      iconSize: [36, 42],
+      iconAnchor: [18, 38],
+      popupAnchor: [0, -36],
+    });
+
+    const marker = L.marker(m.coords, { icon }).addTo(worldMap);
+    marker.phase = 'market';
+
+    marker.bindPopup(`
+      <div class="popup-title">${m.flag} ${m.name}</div>
+      <div class="popup-region">Marché cible</div>
+      <div class="popup-products">${m.note}</div>
+    `);
+
+    mapMarkers.push(marker);
+  });
+
+  // Draw trade routes
+  drawRoutes('all');
+}
+
+function drawRoutes(phase) {
+  // Remove existing routes
+  mapRoutes.forEach(r => worldMap.removeLayer(r));
+  mapRoutes = [];
+
+  const markets = mapData.markets;
+  const sources = phase === 'all' ? mapData.sources : mapData.sources.filter(s => s.phase === phase);
+
+  sources.forEach(s => {
+    markets.forEach(m => {
+      const sourceColor = s.phase === 'p1' ? '#ef4444' : s.phase === 'p2' ? '#f59e0b' : '#3b82f6';
+      const route = L.polyline([s.coords, m.coords], {
+        color: sourceColor,
+        weight: 2,
+        opacity: 0.4,
+        dashArray: '6,8',
+      }).addTo(worldMap);
+
+      route.phase = s.phase;
+      mapRoutes.push(route);
+    });
+  });
+}
+
+function filterMapPhase(phase, el) {
+  document.querySelectorAll('.map-phase-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  // Filter markers
+  mapMarkers.forEach(mk => {
+    if (phase === 'all' || mk.phase === phase || mk.phase === 'market') {
+      if (!worldMap.hasLayer(mk)) worldMap.addLayer(mk);
+    } else {
+      if (worldMap.hasLayer(mk)) worldMap.removeLayer(mk);
+    }
+  });
+
+  drawRoutes(phase);
+}
+
+// ═══════ INIT ═══════
+renderCountries();
+renderEcon('dropship');
+initMap();
+
+// Close modal on Escape
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+{
+  "description": "Grille COGs de référence — prix négociés avec l'agent",
+  "last_updated": "2026-07-09",
+  "currency": "EUR",
+  "cogs": [
+    {
+      "sku": "TSHIRT-BLK-M",
+      "product_name": "T-shirt Premium Noir M",
+      "product_cost": 3.5,
+      "shipping_cost": 4.5,
+      "shipping_cost_by_country": {
+        "FR": 4.5,
+        "BE": 4.0,
+        "DE": 4.2,
+        "ES": 5.0,
+        "IT": 5.2,
+        "NL": 4.0
+      }
+    },
+    {
+      "sku": "TSHIRT-WHT-L",
+      "product_name": "T-shirt Premium Blanc L",
+      "product_cost": 3.5,
+      "shipping_cost": 4.5,
+      "shipping_cost_by_country": {
+        "FR": 4.5,
+        "BE": 4.0,
+        "DE": 4.2,
+        "ES": 5.0,
+        "IT": 5.2,
+        "NL": 4.0
+      }
+    },
+    {
+      "sku": "HOODIE-GRY-XL",
+      "product_name": "Hoodie Gris XL",
+      "product_cost": 8.2,
+      "shipping_cost": 5.5,
+      "shipping_cost_by_country": {
+        "FR": 5.5,
+        "BE": 5.0,
+        "DE": 5.2,
+        "ES": 6.0,
+        "IT": 6.2,
+        "NL": 5.0
+      }
+    },
+    {
+      "sku": "JOGGER-BLK-L",
+      "product_name": "Jogging Noir L",
+      "product_cost": 6.8,
+      "shipping_cost": 5.0,
+      "shipping_cost_by_country": {
+        "FR": 5.0,
+        "BE": 4.5,
+        "DE": 4.7,
+        "ES": 5.5,
+        "IT": 5.7,
+        "NL": 4.5
+      }
+    },
+    {
+      "sku": "CAP-BLK-OS",
+      "product_name": "Casquette Noire",
+      "product_cost": 2.2,
+      "shipping_cost": 3.8,
+      "shipping_cost_by_country": {
+        "FR": 3.8,
+        "BE": 3.3,
+        "DE": 3.5,
+        "ES": 4.3,
+        "IT": 4.5,
+        "NL": 3.3
+      }
+    },
+    {
+      "sku": "SOCKS-5PK",
+      "product_name": "Lot 5 paires chaussettes",
+      "product_cost": 1.8,
+      "shipping_cost": 3.5,
+      "shipping_cost_by_country": {
+        "FR": 3.5,
+        "BE": 3.0,
+        "DE": 3.2,
+        "ES": 4.0,
+        "IT": 4.2,
+        "NL": 3.0
+      }
+    },
+    {
+      "sku": "WALLET-BRN",
+      "product_name": "Portefeuille Cuir Brun",
+      "product_cost": 4.5,
+      "shipping_cost": 4.0,
+      "shipping_cost_by_country": {
+        "FR": 4.0,
+        "BE": 3.5,
+        "DE": 3.7,
+        "ES": 4.5,
+        "IT": 4.7,
+        "NL": 3.5
+      }
+    },
+    {
+      "sku": "WATCH-BLK",
+      "product_name": "Montre Minimaliste Noire",
+      "product_cost": 7.5,
+      "shipping_cost": 5.5,
+      "shipping_cost_by_country": {
+        "FR": 5.5,
+        "BE": 5.0,
+        "DE": 5.2,
+        "ES": 6.0,
+        "IT": 6.2,
+        "NL": 5.0
+      }
+    }
+  ]
+}

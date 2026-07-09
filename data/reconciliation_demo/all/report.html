@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Factures Agent — 2026-07-09T16:36:05</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d28;
+    --border: #2a2d3a;
+    --text: #e4e6eb;
+    --muted: #8b8fa3;
+    --critical: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --success: #22c55e;
+    --accent: #8b5cf6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--accent), #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-card .value { font-size: 1.8rem; font-weight: 700; margin-top: 0.3rem; }
+  .stat-card .delta { font-size: 0.85rem; margin-top: 0.2rem; }
+  .stat-card.alert .value { color: var(--critical); }
+  .stat-card.warning .value { color: var(--warning); }
+  .stat-card.ok .value { color: var(--success); }
+
+  .delta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .delta-bar .left { display: flex; flex-direction: column; }
+  .delta-bar .amount {
+    font-size: 2.5rem;
+    font-weight: 800;
+  }
+  .delta-bar.overcharge .amount { color: var(--critical); }
+  .delta-bar.undercharge .amount { color: var(--info); }
+  .delta-bar.ok .amount { color: var(--success); }
+  .delta-bar .label { color: var(--muted); font-size: 0.9rem; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #21252e;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge.critical { background: rgba(239,68,68,0.15); color: var(--critical); }
+  .badge.warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .badge.info { background: rgba(59,130,246,0.15); color: var(--info); }
+
+  .cat-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: rgba(139,92,246,0.12);
+    color: var(--accent);
+  }
+
+  .monospace { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.8rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-title .count {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  details summary {
+    cursor: pointer;
+    padding: 0.5rem 0;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔍 Audit Factures Agent</h1>
+  <p class="subtitle">ImportExport Pro · Réconciliation automatique · 2026-07-09T16:36:05</p>
+</header>
+
+<div class="summary-grid">
+  <div class="stat-card">
+    <div class="label">Commandes Shopify</div>
+    <div class="value">80</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Lignes facture</div>
+    <div class="value">121</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Commandes matchées</div>
+    <div class="value warning">74/80</div>
+  </div>
+  <div class="stat-card alert">
+    <div class="label">Écarts détectés</div>
+    <div class="value">30</div>
+  </div>
+</div>
+
+<div class="delta-bar overcharge">
+  <div class="left">
+    <span class="label">Écart total (facturé vs attendu)</span>
+    <span class="amount">+42.43€</span>
+  </div>
+  <div class="right" style="text-align:right">
+    <div style="font-size:0.85rem;color:var(--muted)">
+      Attendu: <strong style="color:var(--text)">1652.20€</strong><br>
+      Facturé: <strong style="color:var(--text)">1694.63€</strong>
+    </div>
+  </div>
+</div>
+
+
+<div class="section-title">
+  ⚠️ Écarts détectés
+  <span class="count">30 (22 critiques, 8 avertissements)</span>
+</div>
+<table>
+<thead>
+<tr>
+  <th>Sévérité</th>
+  <th>Type</th>
+  <th>Commande</th>
+  <th>SKU</th>
+  <th>Description</th>
+  <th style="text-align:right">Attendu</th>
+  <th style="text-align:right">Facturé</th>
+  <th style="text-align:right">Δ</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100043</td>
+  <td class="monospace">JOGGER-BLK-L</td>
+  <td>#100043: 1x JOGGER-BLK-L → Attendu 12.50€ (12.50€/u) | Facturé 37.50€ (12.50€/u) | Δ +25.00€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">12.50€</td>
+  <td style="text-align:right;color:var(--muted)">37.50€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +25.00€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100025</td>
+  <td class="monospace">HOODIE-GRY-XL</td>
+  <td>Commande #100025: 1x HOODIE-GRY-XL (Hoodie Gris XL) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">13.20€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -13.20€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100053</td>
+  <td class="monospace">WATCH-BLK</td>
+  <td>Commande #100053: 1x WATCH-BLK (Montre Minimaliste Noire) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">12.70€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -12.70€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100029</td>
+  <td class="monospace">SOCKS-5PK</td>
+  <td>#100029: 4x SOCKS-5PK → Attendu 19.20€ (4.80€/u) | Facturé 30.72€ (7.68€/u) | Δ +11.52€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">19.20€</td>
+  <td style="text-align:right;color:var(--muted)">30.72€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +11.52€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100053</td>
+  <td class="monospace">JOGGER-BLK-L</td>
+  <td>Commande #100053: 1x JOGGER-BLK-L (Jogging Noir L) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">11.50€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -11.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100007</td>
+  <td class="monospace">JOGGER-BLK-L</td>
+  <td>#100007: 1x JOGGER-BLK-L → Attendu 11.30€ (11.30€/u) | Facturé 22.60€ (11.30€/u) | Δ +11.30€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">11.30€</td>
+  <td style="text-align:right;color:var(--muted)">22.60€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +11.30€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100022</td>
+  <td class="monospace">WATCH-BLK</td>
+  <td>#100022: 3x WATCH-BLK → Attendu 40.50€ (13.50€/u) | Facturé 48.90€ (16.30€/u) | Δ +8.40€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">40.50€</td>
+  <td style="text-align:right;color:var(--muted)">48.90€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +8.40€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100011</td>
+  <td class="monospace">TSHIRT-BLK-M</td>
+  <td>Commande #100011: 1x TSHIRT-BLK-M (T-shirt Premium Noir M) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">8.00€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -8.00€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100027</td>
+  <td class="monospace">TSHIRT-WHT-L</td>
+  <td>Commande #100027: 1x TSHIRT-WHT-L (T-shirt Premium Blanc L) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">7.70€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -7.70€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100025</td>
+  <td class="monospace">TSHIRT-BLK-M</td>
+  <td>Commande #100025: 1x TSHIRT-BLK-M (T-shirt Premium Noir M) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">7.50€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -7.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100062</td>
+  <td class="monospace">TSHIRT-WHT-L</td>
+  <td>Commande #100062: 1x TSHIRT-WHT-L (T-shirt Premium Blanc L) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">7.50€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -7.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100068</td>
+  <td class="monospace">TSHIRT-WHT-L</td>
+  <td>Commande #100068: 1x TSHIRT-WHT-L (T-shirt Premium Blanc L) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">7.50€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -7.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100031</td>
+  <td class="monospace">WATCH-BLK</td>
+  <td>#100031: 4x WATCH-BLK → Attendu 50.00€ (12.50€/u) | Facturé 56.36€ (14.09€/u) | Δ +6.36€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">50.00€</td>
+  <td style="text-align:right;color:var(--muted)">56.36€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +6.36€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100032</td>
+  <td class="monospace">TSHIRT-WHT-L</td>
+  <td>#100032: 2x TSHIRT-WHT-L → Attendu 15.00€ (7.50€/u) | Facturé 20.52€ (10.26€/u) | Δ +5.52€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">15.00€</td>
+  <td style="text-align:right;color:var(--muted)">20.52€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +5.52€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">MISSING_INVOICE</span></td>
+  <td class="monospace">#100025</td>
+  <td class="monospace">CAP-BLK-OS</td>
+  <td>Commande #100025: 1x CAP-BLK-OS (Casquette Noire) — absent de la facture agent</td>
+  <td style="text-align:right;color:var(--muted)">5.50€</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--info)">
+    -5.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100037</td>
+  <td class="monospace">CAP-BLK-OS</td>
+  <td>#100037: 1x CAP-BLK-OS → Attendu 5.50€ (5.50€/u) | Facturé 11.00€ (5.50€/u) | Δ +5.50€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">5.50€</td>
+  <td style="text-align:right;color:var(--muted)">11.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +5.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100048</td>
+  <td class="monospace">SOCKS-5PK</td>
+  <td>#100048: 2x SOCKS-5PK → Attendu 10.60€ (5.30€/u) | Facturé 15.48€ (7.74€/u) | Δ +4.88€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">10.60€</td>
+  <td style="text-align:right;color:var(--muted)">15.48€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +4.88€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100067</td>
+  <td class="monospace">TSHIRT-WHT-L</td>
+  <td>#100067: 1x TSHIRT-WHT-L → Attendu 8.00€ (8.00€/u) | Facturé 10.97€ (10.97€/u) | Δ +2.97€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">8.00€</td>
+  <td style="text-align:right;color:var(--muted)">10.97€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +2.97€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100049</td>
+  <td class="monospace">JOGGER-BLK-L</td>
+  <td>#100049: 1x JOGGER-BLK-L → Attendu 11.80€ (11.80€/u) | Facturé 14.42€ (14.42€/u) | Δ +2.62€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">11.80€</td>
+  <td style="text-align:right;color:var(--muted)">14.42€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +2.62€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100076</td>
+  <td class="monospace">WALLET-BRN</td>
+  <td>#100076: 1x WALLET-BRN → Attendu 9.20€ (9.20€/u) | Facturé 11.69€ (11.69€/u) | Δ +2.49€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">9.20€</td>
+  <td style="text-align:right;color:var(--muted)">11.69€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +2.49€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100022</td>
+  <td class="monospace">HOODIE-GRY-XL</td>
+  <td>#100022: 1x HOODIE-GRY-XL → Attendu 14.20€ (14.20€/u) | Facturé 16.48€ (16.48€/u) | Δ +2.28€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">14.20€</td>
+  <td style="text-align:right;color:var(--muted)">16.48€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +2.28€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge critical">CRITICAL</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100022</td>
+  <td class="monospace">TSHIRT-WHT-L</td>
+  <td>#100022: 1x TSHIRT-WHT-L → Attendu 8.50€ (8.50€/u) | Facturé 10.59€ (10.59€/u) | Δ +2.09€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">8.50€</td>
+  <td style="text-align:right;color:var(--muted)">10.59€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +2.09€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">EXTRA_INVOICE</span></td>
+  <td class="monospace">—</td>
+  <td class="monospace">SOCKS-5PK</td>
+  <td>Ligne facture sans commande Shopify correspondante: 5x SOCKS-5PK @ 5.30€ (ref agent: N/A)</td>
+  <td style="text-align:right;color:var(--muted)">0.00€</td>
+  <td style="text-align:right;color:var(--muted)">26.50€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +26.50€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">QUANTITY_MISMATCH</span></td>
+  <td class="monospace">#100043</td>
+  <td class="monospace">JOGGER-BLK-L</td>
+  <td>#100043: Qté Shopify=1 vs Qté facture=3</td>
+  <td style="text-align:right;color:var(--muted)">1.00€</td>
+  <td style="text-align:right;color:var(--muted)">3.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +2.00€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100031</td>
+  <td class="monospace">SOCKS-5PK</td>
+  <td>#100031: 1x SOCKS-5PK → Attendu 4.80€ (4.80€/u) | Facturé 6.62€ (6.62€/u) | Δ +1.82€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">4.80€</td>
+  <td style="text-align:right;color:var(--muted)">6.62€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +1.82€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100051</td>
+  <td class="monospace">WALLET-BRN</td>
+  <td>#100051: 1x WALLET-BRN → Attendu 8.20€ (8.20€/u) | Facturé 9.79€ (9.79€/u) | Δ +1.59€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">8.20€</td>
+  <td style="text-align:right;color:var(--muted)">9.79€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +1.59€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100017</td>
+  <td class="monospace">HOODIE-GRY-XL</td>
+  <td>#100017: 1x HOODIE-GRY-XL → Attendu 13.40€ (13.40€/u) | Facturé 14.75€ (14.75€/u) | Δ +1.35€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">13.40€</td>
+  <td style="text-align:right;color:var(--muted)">14.75€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +1.35€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">PRICE_MISMATCH</span></td>
+  <td class="monospace">#100017</td>
+  <td class="monospace">WALLET-BRN</td>
+  <td>#100017: 1x WALLET-BRN → Attendu 8.20€ (8.20€/u) | Facturé 9.54€ (9.54€/u) | Δ +1.34€ (SURFACTURATION)</td>
+  <td style="text-align:right;color:var(--muted)">8.20€</td>
+  <td style="text-align:right;color:var(--muted)">9.54€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +1.34€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">QUANTITY_MISMATCH</span></td>
+  <td class="monospace">#100007</td>
+  <td class="monospace">JOGGER-BLK-L</td>
+  <td>#100007: Qté Shopify=1 vs Qté facture=2</td>
+  <td style="text-align:right;color:var(--muted)">1.00€</td>
+  <td style="text-align:right;color:var(--muted)">2.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +1.00€
+  </td>
+</tr>
+<tr>
+  <td><span class="badge warning">WARNING</span></td>
+  <td><span class="cat-badge">QUANTITY_MISMATCH</span></td>
+  <td class="monospace">#100037</td>
+  <td class="monospace">CAP-BLK-OS</td>
+  <td>#100037: Qté Shopify=1 vs Qté facture=2</td>
+  <td style="text-align:right;color:var(--muted)">1.00€</td>
+  <td style="text-align:right;color:var(--muted)">2.00€</td>
+  <td style="text-align:right;font-weight:600;color:var(--critical)">
+    +1.00€
+  </td>
+</tr>
+</tbody>
+</table>
+
+<footer>
+  <p>Invoice Reconciler v1.0 · Généré le 2026-07-09T16:36:05</p>
+  <p style="margin-top:0.3rem">Tolérance prix: ±0.02€ · Période: 2026-07-01 00:00 → 2026-07-10 20:00</p>
+</footer>
+
+</body>
+</html>

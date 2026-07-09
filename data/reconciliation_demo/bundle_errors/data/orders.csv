@@ -1,0 +1,81 @@
+order_id,date,customer_email,shipping_country,sku,product_name,quantity,unit_price,total
+#100000,2026-07-01 00:00,customer0@example.com,ES,HOODIE-GRY-XL,Hoodie Gris XL,1,24.82,24.82
+#100001,2026-07-01 02:00,customer1@example.com,DE,WATCH-BLK;TSHIRT-WHT-L,Montre Minimaliste Noire;T-shirt Premium Blanc L,1;1,28.82;15.17,43.99
+#100002,2026-07-01 06:00,customer2@example.com,ES,HOODIE-GRY-XL;JOGGER-BLK-L,Hoodie Gris XL;Jogging Noir L,1;1,34.81;29.99,64.80
+#100003,2026-07-01 10:00,customer3@example.com,NL,SOCKS-5PK;JOGGER-BLK-L;TSHIRT-BLK-M,Lot 5 paires chaussettes;Jogging Noir L;T-shirt Premium Noir M,1;1;1,5.06;30.48;12.55,48.09
+#100004,2026-07-01 11:00,customer4@example.com,IT,TSHIRT-BLK-M,T-shirt Premium Noir M,1,11.08,11.08
+#100005,2026-07-01 16:00,customer5@example.com,BE,HOODIE-GRY-XL;CAP-BLK-OS;SOCKS-5PK,Hoodie Gris XL;Casquette Noire;Lot 5 paires chaussettes,1;1;1,24.49;8.72;7.91,41.12
+#100006,2026-07-01 19:00,customer6@example.com,FR,TSHIRT-BLK-M,T-shirt Premium Noir M,1,10.61,10.61
+#100007,2026-07-01 21:00,customer7@example.com,BE,JOGGER-BLK-L;WATCH-BLK,Jogging Noir L;Montre Minimaliste Noire,1;1,23.71;25.51,49.22
+#100008,2026-07-02 01:00,customer8@example.com,ES,HOODIE-GRY-XL;CAP-BLK-OS,Hoodie Gris XL;Casquette Noire,2;1,24.30;6.81,55.41
+#100009,2026-07-02 02:00,customer9@example.com,ES,JOGGER-BLK-L,Jogging Noir L,3,27.95,83.85
+#100010,2026-07-02 05:00,customer10@example.com,DE,SOCKS-5PK,Lot 5 paires chaussettes,1,5.26,5.26
+#100011,2026-07-02 09:00,customer11@example.com,FR,TSHIRT-BLK-M,T-shirt Premium Noir M,1,12.04,12.04
+#100012,2026-07-02 12:00,customer12@example.com,ES,SOCKS-5PK,Lot 5 paires chaussettes,1,5.59,5.59
+#100013,2026-07-02 14:00,customer13@example.com,DE,WATCH-BLK;TSHIRT-WHT-L;HOODIE-GRY-XL,Montre Minimaliste Noire;T-shirt Premium Blanc L;Hoodie Gris XL,2;1;1,29.33;15.00;26.01,99.67
+#100014,2026-07-02 19:00,customer14@example.com,NL,CAP-BLK-OS;JOGGER-BLK-L;TSHIRT-BLK-M,Casquette Noire;Jogging Noir L;T-shirt Premium Noir M,3;1;3,9.76;24.86;14.49,97.61
+#100015,2026-07-02 22:00,customer15@example.com,BE,WALLET-BRN;HOODIE-GRY-XL;JOGGER-BLK-L,Portefeuille Cuir Brun;Hoodie Gris XL;Jogging Noir L,4;1;4,13.82;32.42;26.75,194.70
+#100016,2026-07-03 00:00,customer16@example.com,BE,JOGGER-BLK-L,Jogging Noir L,1,26.75,26.75
+#100017,2026-07-03 04:00,customer17@example.com,DE,HOODIE-GRY-XL;WALLET-BRN,Hoodie Gris XL;Portefeuille Cuir Brun,1;1,32.12;19.23,51.35
+#100018,2026-07-03 05:00,customer18@example.com,ES,WALLET-BRN;TSHIRT-BLK-M;WATCH-BLK,Portefeuille Cuir Brun;T-shirt Premium Noir M;Montre Minimaliste Noire,1;1;2,14.15;15.45;27.52,84.64
+#100019,2026-07-03 09:00,customer19@example.com,BE,WALLET-BRN,Portefeuille Cuir Brun,1,16.66,16.66
+#100020,2026-07-03 13:00,customer20@example.com,NL,JOGGER-BLK-L;SOCKS-5PK;TSHIRT-BLK-M,Jogging Noir L;Lot 5 paires chaussettes;T-shirt Premium Noir M,3;1;1,19.91;5.22;15.58,80.53
+#100021,2026-07-03 16:00,customer21@example.com,NL,CAP-BLK-OS,Casquette Noire,1,6.53,6.53
+#100022,2026-07-03 18:00,customer22@example.com,ES,WATCH-BLK;HOODIE-GRY-XL;TSHIRT-WHT-L,Montre Minimaliste Noire;Hoodie Gris XL;T-shirt Premium Blanc L,3;1;1,32.07;28.38;14.05,138.64
+#100023,2026-07-03 21:00,customer23@example.com,DE,WATCH-BLK,Montre Minimaliste Noire,1,32.34,32.34
+#100024,2026-07-04 00:00,customer24@example.com,BE,WATCH-BLK;SOCKS-5PK;TSHIRT-WHT-L,Montre Minimaliste Noire;Lot 5 paires chaussettes;T-shirt Premium Blanc L,4;1;1,24.05;5.09;12.74,114.03
+#100025,2026-07-04 03:00,customer25@example.com,NL,TSHIRT-BLK-M;CAP-BLK-OS;HOODIE-GRY-XL,T-shirt Premium Noir M;Casquette Noire;Hoodie Gris XL,1;1;1,10.79;6.34;27.73,44.86
+#100026,2026-07-04 05:00,customer26@example.com,IT,WATCH-BLK;TSHIRT-BLK-M,Montre Minimaliste Noire;T-shirt Premium Noir M,1;2,26.33;12.68,51.69
+#100027,2026-07-04 09:00,customer27@example.com,DE,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,10.98,10.98
+#100028,2026-07-04 13:00,customer28@example.com,BE,TSHIRT-WHT-L;SOCKS-5PK,T-shirt Premium Blanc L;Lot 5 paires chaussettes,1;1,10.61;5.14,15.75
+#100029,2026-07-04 16:00,customer29@example.com,NL,SOCKS-5PK,Lot 5 paires chaussettes,4,5.75,23.00
+#100030,2026-07-04 19:00,customer30@example.com,IT,TSHIRT-BLK-M,T-shirt Premium Noir M,4,12.40,49.60
+#100031,2026-07-04 21:00,customer31@example.com,BE,WATCH-BLK;SOCKS-5PK,Montre Minimaliste Noire;Lot 5 paires chaussettes,4;1,32.85;7.85,139.25
+#100032,2026-07-04 23:00,customer32@example.com,BE,TSHIRT-WHT-L,T-shirt Premium Blanc L,2,15.01,30.02
+#100033,2026-07-05 02:00,customer33@example.com,ES,SOCKS-5PK,Lot 5 paires chaussettes,1,6.83,6.83
+#100034,2026-07-05 05:00,customer34@example.com,DE,TSHIRT-BLK-M;HOODIE-GRY-XL,T-shirt Premium Noir M;Hoodie Gris XL,3;1,11.53;34.13,68.72
+#100035,2026-07-05 08:00,customer35@example.com,DE,SOCKS-5PK,Lot 5 paires chaussettes,4,6.04,24.16
+#100036,2026-07-05 11:00,customer36@example.com,ES,HOODIE-GRY-XL;SOCKS-5PK,Hoodie Gris XL;Lot 5 paires chaussettes,1;4,33.61;6.26,58.65
+#100037,2026-07-05 16:00,customer37@example.com,NL,HOODIE-GRY-XL;CAP-BLK-OS,Hoodie Gris XL;Casquette Noire,1;1,23.72;7.13,30.85
+#100038,2026-07-05 19:00,customer38@example.com,FR,TSHIRT-BLK-M,T-shirt Premium Noir M,2,15.16,30.32
+#100039,2026-07-05 20:00,customer39@example.com,NL,CAP-BLK-OS,Casquette Noire,1,9.02,9.02
+#100040,2026-07-05 23:00,customer40@example.com,FR,WALLET-BRN;JOGGER-BLK-L,Portefeuille Cuir Brun;Jogging Noir L,1;1,17.10;20.57,37.67
+#100041,2026-07-06 04:00,customer41@example.com,FR,HOODIE-GRY-XL,Hoodie Gris XL,1,30.95,30.95
+#100042,2026-07-06 05:00,customer42@example.com,NL,JOGGER-BLK-L;WALLET-BRN;TSHIRT-WHT-L,Jogging Noir L;Portefeuille Cuir Brun;T-shirt Premium Blanc L,1;1;1,27.57;19.03;13.68,60.28
+#100043,2026-07-06 10:00,customer43@example.com,IT,JOGGER-BLK-L;TSHIRT-WHT-L,Jogging Noir L;T-shirt Premium Blanc L,1;1,26.98;12.92,39.90
+#100044,2026-07-06 11:00,customer44@example.com,BE,SOCKS-5PK,Lot 5 paires chaussettes,1,5.34,5.34
+#100045,2026-07-06 16:00,customer45@example.com,FR,TSHIRT-BLK-M;HOODIE-GRY-XL;TSHIRT-WHT-L,T-shirt Premium Noir M;Hoodie Gris XL;T-shirt Premium Blanc L,4;1;1,11.54;35.83;13.23,95.22
+#100046,2026-07-06 18:00,customer46@example.com,BE,HOODIE-GRY-XL;WATCH-BLK,Hoodie Gris XL;Montre Minimaliste Noire,1;1,32.67;23.53,56.20
+#100047,2026-07-06 20:00,customer47@example.com,FR,HOODIE-GRY-XL,Hoodie Gris XL,1,34.60,34.60
+#100048,2026-07-07 00:00,customer48@example.com,FR,SOCKS-5PK,Lot 5 paires chaussettes,2,6.69,13.38
+#100049,2026-07-07 02:00,customer49@example.com,FR,JOGGER-BLK-L,Jogging Noir L,1,26.22,26.22
+#100050,2026-07-07 05:00,customer50@example.com,NL,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,10.28,10.28
+#100051,2026-07-07 10:00,customer51@example.com,DE,WALLET-BRN,Portefeuille Cuir Brun,1,19.52,19.52
+#100052,2026-07-07 12:00,customer52@example.com,DE,CAP-BLK-OS;WATCH-BLK,Casquette Noire;Montre Minimaliste Noire,1;1,9.64;25.16,34.80
+#100053,2026-07-07 14:00,customer53@example.com,DE,JOGGER-BLK-L;WATCH-BLK,Jogging Noir L;Montre Minimaliste Noire,1;1,25.07;24.34,49.41
+#100054,2026-07-07 18:00,customer54@example.com,FR,WATCH-BLK;WALLET-BRN;SOCKS-5PK,Montre Minimaliste Noire;Portefeuille Cuir Brun;Lot 5 paires chaussettes,1;1;1,31.12;16.50;7.16,54.78
+#100055,2026-07-07 20:00,customer55@example.com,DE,JOGGER-BLK-L,Jogging Noir L,1,29.74,29.74
+#100056,2026-07-08 00:00,customer56@example.com,NL,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,10.08,10.08
+#100057,2026-07-08 02:00,customer57@example.com,NL,WALLET-BRN,Portefeuille Cuir Brun,1,19.36,19.36
+#100058,2026-07-08 07:00,customer58@example.com,IT,TSHIRT-BLK-M,T-shirt Premium Noir M,1,11.71,11.71
+#100059,2026-07-08 08:00,customer59@example.com,NL,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,12.36,12.36
+#100060,2026-07-08 12:00,customer60@example.com,BE,HOODIE-GRY-XL;SOCKS-5PK;JOGGER-BLK-L,Hoodie Gris XL;Lot 5 paires chaussettes;Jogging Noir L,1;1;1,34.70;6.22;22.15,63.07
+#100061,2026-07-08 16:00,customer61@example.com,DE,HOODIE-GRY-XL,Hoodie Gris XL,1,33.10,33.10
+#100062,2026-07-08 17:00,customer62@example.com,NL,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,12.13,12.13
+#100063,2026-07-08 21:00,customer63@example.com,IT,CAP-BLK-OS,Casquette Noire,3,8.03,24.09
+#100064,2026-07-09 01:00,customer64@example.com,BE,HOODIE-GRY-XL,Hoodie Gris XL,1,30.07,30.07
+#100065,2026-07-09 04:00,customer65@example.com,BE,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,12.39,12.39
+#100066,2026-07-09 05:00,customer66@example.com,IT,WALLET-BRN,Portefeuille Cuir Brun,1,13.23,13.23
+#100067,2026-07-09 09:00,customer67@example.com,FR,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,10.96,10.96
+#100068,2026-07-09 11:00,customer68@example.com,BE,TSHIRT-WHT-L,T-shirt Premium Blanc L,1,11.33,11.33
+#100069,2026-07-09 15:00,customer69@example.com,BE,TSHIRT-WHT-L;CAP-BLK-OS,T-shirt Premium Blanc L;Casquette Noire,1;3,9.95;7.67,32.96
+#100070,2026-07-09 19:00,customer70@example.com,FR,CAP-BLK-OS,Casquette Noire,1,8.47,8.47
+#100071,2026-07-09 20:00,customer71@example.com,DE,SOCKS-5PK,Lot 5 paires chaussettes,1,6.73,6.73
+#100072,2026-07-10 01:00,customer72@example.com,BE,WATCH-BLK;TSHIRT-WHT-L;CAP-BLK-OS,Montre Minimaliste Noire;T-shirt Premium Blanc L;Casquette Noire,1;1;1,23.25;14.55;6.22,44.02
+#100073,2026-07-10 04:00,customer73@example.com,DE,WALLET-BRN,Portefeuille Cuir Brun,1,16.68,16.68
+#100074,2026-07-10 07:00,customer74@example.com,IT,SOCKS-5PK,Lot 5 paires chaussettes,1,6.05,6.05
+#100075,2026-07-10 10:00,customer75@example.com,FR,TSHIRT-BLK-M;SOCKS-5PK;HOODIE-GRY-XL,T-shirt Premium Noir M;Lot 5 paires chaussettes;Hoodie Gris XL,1;1;1,13.58;6.96;28.94,49.48
+#100076,2026-07-10 13:00,customer76@example.com,IT,WALLET-BRN,Portefeuille Cuir Brun,1,19.63,19.63
+#100077,2026-07-10 15:00,customer77@example.com,BE,TSHIRT-WHT-L,T-shirt Premium Blanc L,3,12.12,36.36
+#100078,2026-07-10 19:00,customer78@example.com,BE,CAP-BLK-OS,Casquette Noire,3,7.69,23.07
+#100079,2026-07-10 20:00,customer79@example.com,BE,HOODIE-GRY-XL,Hoodie Gris XL,1,32.74,32.74

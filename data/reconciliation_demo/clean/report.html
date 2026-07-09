@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audit Factures Agent — 2026-07-09T16:36:05</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d28;
+    --border: #2a2d3a;
+    --text: #e4e6eb;
+    --muted: #8b8fa3;
+    --critical: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --success: #22c55e;
+    --accent: #8b5cf6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--accent), #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-card .value { font-size: 1.8rem; font-weight: 700; margin-top: 0.3rem; }
+  .stat-card .delta { font-size: 0.85rem; margin-top: 0.2rem; }
+  .stat-card.alert .value { color: var(--critical); }
+  .stat-card.warning .value { color: var(--warning); }
+  .stat-card.ok .value { color: var(--success); }
+
+  .delta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .delta-bar .left { display: flex; flex-direction: column; }
+  .delta-bar .amount {
+    font-size: 2.5rem;
+    font-weight: 800;
+  }
+  .delta-bar.overcharge .amount { color: var(--critical); }
+  .delta-bar.undercharge .amount { color: var(--info); }
+  .delta-bar.ok .amount { color: var(--success); }
+  .delta-bar .label { color: var(--muted); font-size: 0.9rem; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #21252e;
+    padding: 0.8rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .badge.critical { background: rgba(239,68,68,0.15); color: var(--critical); }
+  .badge.warning { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .badge.info { background: rgba(59,130,246,0.15); color: var(--info); }
+
+  .cat-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    background: rgba(139,92,246,0.12);
+    color: var(--accent);
+  }
+
+  .monospace { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.8rem; }
+
+  footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-title .count {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.1rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  details summary {
+    cursor: pointer;
+    padding: 0.5rem 0;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔍 Audit Factures Agent</h1>
+  <p class="subtitle">ImportExport Pro · Réconciliation automatique · 2026-07-09T16:36:05</p>
+</header>
+
+<div class="summary-grid">
+  <div class="stat-card">
+    <div class="label">Commandes Shopify</div>
+    <div class="value">80</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Lignes facture</div>
+    <div class="value">112</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Commandes matchées</div>
+    <div class="value ok">80/80</div>
+  </div>
+  <div class="stat-card ">
+    <div class="label">Écarts détectés</div>
+    <div class="value">0</div>
+  </div>
+</div>
+
+<div class="delta-bar ok">
+  <div class="left">
+    <span class="label">Écart total (facturé vs attendu)</span>
+    <span class="amount">±0.00€</span>
+  </div>
+  <div class="right" style="text-align:right">
+    <div style="font-size:0.85rem;color:var(--muted)">
+      Attendu: <strong style="color:var(--text)">1287.90€</strong><br>
+      Facturé: <strong style="color:var(--text)">1287.90€</strong>
+    </div>
+  </div>
+</div>
+
+
+<div class="empty-state">
+  <h2>✅ Aucun écart détecté</h2>
+  <p>Toutes les factures correspondent aux commandes et à la grille COGs.</p>
+</div>
+
+<footer>
+  <p>Invoice Reconciler v1.0 · Généré le 2026-07-09T16:36:05</p>
+  <p style="margin-top:0.3rem">Tolérance prix: ±0.02€ · Période: 2026-07-01 01:00 → 2026-07-10 21:00</p>
+</footer>
+
+</body>
+</html>

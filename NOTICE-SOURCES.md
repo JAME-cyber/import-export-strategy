@@ -145,6 +145,18 @@ passage est **temporairement retiré ou réécrit** pendant vérification.
 - **Vigilance éditoriale :** les « AI employees » présentés sont des **wrappers** (prompts Claude + connecteurs custom), pas une IA propriétaire. La formulation « 100 % AI automated » est neutralisée en « assistance IA au prototypage ». La vidéo **omet** conformité CE/FCC, RGPD, droits d'auteur (clonage), TVA, RC produit.
 - **Date de consultation :** 21 juin 2026.
 
+## 9. Damian (commodity trader physique)
+
+> Cas d'étude anti-biais détaillé : `knowledge-base/synthesis/13-CAS-CHROME-TRADING-PNL-REEL-DAMIAN.md`.
+
+- **URL vidéo :** https://www.youtube.com/watch?v=_5JWycWz5Cg
+- **Type de contenu :** commodity trading physique (minerai de chrome), P&L réels, récits d'échecs, leçons opérationnelles.
+- **Fiabilité :** ⚠️ **PARTIEL** — contenu honnête (montre ses pertes) mais chiffres de mémoire (~4 ans), non auditables.
+- **Conflit d'intérêt :** propose une academy (lien en description vidéo). Biais modéré — cette vidéo ne promet rien.
+- **Usage dans le projet :** coûts par poste, structures d'incoterms réels, marges nettes réalistes (2,75–7 %), leçons opérationnelles (cut your losses, stay in your lane, sous-capitalisation). **Cas anti-biais positif** — valide les tables de correction du Roster.
+- **Vigilance :** marges déjà réalistes (pas de correction ×0,25 nécessaire). Chiffres à traiter comme ordres de grandeur, non comme données exactes.
+- **Date de consultation :** 15 juillet 2026.
+
 ---
 
 # Sources institutionnelles et techniques (vérification)
